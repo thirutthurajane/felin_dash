@@ -11,7 +11,9 @@ void main() {
     tester.testGameWidget(
       'is positioned at GameConstants.groundY',
       verify: (game, _) async {
-        final ground = game.children.whereType<GroundComponent>().first;
+        // Components are added to world, not directly to game.
+        final ground =
+            game.world.children.whereType<GroundComponent>().first;
         expect(ground.position.y, closeTo(GameConstants.groundY, 0.1));
       },
     );
@@ -19,7 +21,8 @@ void main() {
     tester.testGameWidget(
       'has two tile children for seamless scrolling',
       verify: (game, _) async {
-        final ground = game.children.whereType<GroundComponent>().first;
+        final ground =
+            game.world.children.whereType<GroundComponent>().first;
         expect(ground.children.length, equals(2));
       },
     );

@@ -36,8 +36,10 @@ void main() {
       'has a non-null animation with 8 frames',
       verify: (game, _) async {
         expect(game.cat.animation, isNotNull);
-        expect(game.cat.animation!.frames.length,
-            equals(SpriteConfig.catRunFrames));
+        expect(
+          game.cat.animation!.frames.length,
+          equals(SpriteConfig.catRunFrames),
+        );
       },
     );
 

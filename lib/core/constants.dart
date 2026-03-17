@@ -30,6 +30,10 @@ abstract final class GameConstants {
 
   // ── Slide ─────────────────────────────────────────────────────────────────
   static const double slideDuration = 0.8; // seconds
+
+  // ── Virtual resolution (fixed-resolution viewport) ────────────────────────
+  static const double virtualWidth = 800.0;
+  static const double virtualHeight = 600.0;
 }
 
 // ── Asset path constants ───────────────────────────────────────────────────

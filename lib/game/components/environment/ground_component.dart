@@ -7,7 +7,9 @@ class GroundComponent extends PositionComponent
     with HasGameRef<FelineDashGame> {
   static const double _tileHeight = 80.0;
 
-  late double _tileWidth;
+  // Use the fixed virtual width so tiles cover the full virtual screen.
+  static const double _tileWidth = GameConstants.virtualWidth;
+
   late final SpriteComponent _tileA;
   late final SpriteComponent _tileB;
 
@@ -15,8 +17,8 @@ class GroundComponent extends PositionComponent
   Future<void> onLoad() async {
     await super.onLoad();
 
-    _tileWidth = gameRef.size.x;
-    final sprite = await Sprite.load(ImageAssets.ground);
+    final image = await gameRef.images.load(ImageAssets.ground);
+    final sprite = Sprite(image);
     final tileSize = Vector2(_tileWidth, _tileHeight);
 
     _tileA = SpriteComponent(sprite: sprite, size: tileSize)
