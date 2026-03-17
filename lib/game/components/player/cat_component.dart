@@ -12,6 +12,15 @@ class CatComponent extends SpriteAnimationComponent
 
   CatState state = CatState.running;
 
+  double _velocityY = 0.0;
+  bool _isOnGround = true;
+
+  /// Current vertical velocity in px/s (negative = upward).
+  double get velocityY => _velocityY;
+
+  /// Whether the cat is currently on the ground.
+  bool get isOnGround => _isOnGround;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -36,5 +45,35 @@ class CatComponent extends SpriteAnimationComponent
     );
 
     add(RectangleHitbox());
+  }
+
+  /// Apply jump impulse. No-op when already airborne.
+  void jump() {
+    if (!_isOnGround) return;
+    _velocityY = GameConstants.jumpImpulse;
+    _isOnGround = false;
+    state = CatState.jumping;
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    if (!_isOnGround) {
+      // Apply gravity, capped at terminal velocity.
+      _velocityY = (_velocityY + GameConstants.gravity * dt)
+          .clamp(-double.infinity, GameConstants.terminalVelocity);
+
+      position.y += _velocityY * dt;
+
+      // Ground collision
+      final groundedY = GameConstants.groundY - size.y;
+      if (position.y >= groundedY) {
+        position.y = groundedY;
+        _velocityY = 0.0;
+        _isOnGround = true;
+        state = CatState.running;
+      }
+    }
   }
 }
