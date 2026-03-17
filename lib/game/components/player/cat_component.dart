@@ -6,7 +6,7 @@ import '../../feline_dash_game.dart';
 import 'cat_state.dart';
 
 class CatComponent extends SpriteAnimationComponent
-    with HasGameRef<FelineDashGame> {
+    with HasGameReference<FelineDashGame> {
   /// Fixed horizontal position – the world scrolls, the cat stays here.
   static const double fixedX = 100.0;
 
@@ -16,7 +16,7 @@ class CatComponent extends SpriteAnimationComponent
   Future<void> onLoad() async {
     await super.onLoad();
 
-    final spriteSheet = await gameRef.images.load(ImageAssets.catRun);
+    final spriteSheet = await game.images.load(ImageAssets.catRun);
     animation = SpriteAnimation.fromFrameData(
       spriteSheet,
       SpriteAnimationData.sequenced(

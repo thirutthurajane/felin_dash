@@ -4,7 +4,7 @@ import '../../../core/constants.dart';
 import '../../feline_dash_game.dart';
 
 class GroundComponent extends PositionComponent
-    with HasGameRef<FelineDashGame> {
+    with HasGameReference<FelineDashGame> {
   static const double _tileHeight = 80.0;
 
   late double _tileWidth;
@@ -15,7 +15,7 @@ class GroundComponent extends PositionComponent
   Future<void> onLoad() async {
     await super.onLoad();
 
-    _tileWidth = gameRef.size.x;
+    _tileWidth = game.size.x;
     final sprite = await Sprite.load(ImageAssets.ground);
     final tileSize = Vector2(_tileWidth, _tileHeight);
 
@@ -33,7 +33,7 @@ class GroundComponent extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
-    final speed = gameRef.difficultySystem.speed;
+    final speed = game.difficultySystem.speed;
 
     for (final tile in [_tileA, _tileB]) {
       tile.position.x -= speed * dt;

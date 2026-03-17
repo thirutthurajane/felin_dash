@@ -2,7 +2,7 @@ import 'package:feline_dash/core/constants.dart';
 import 'package:feline_dash/game/components/player/cat_component.dart';
 import 'package:feline_dash/game/components/player/cat_state.dart';
 import 'package:feline_dash/game/feline_dash_game.dart';
-import 'package:flame/components.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 
