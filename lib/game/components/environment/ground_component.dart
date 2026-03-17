@@ -4,7 +4,7 @@ import '../../../core/constants.dart';
 import '../../feline_dash_game.dart';
 
 class GroundComponent extends PositionComponent
-    with HasGameRef<FelineDashGame> {
+    with HasGameReference<FelineDashGame> {
   static const double _tileHeight = 80.0;
 
   // Use the fixed virtual width so tiles cover the full virtual screen.
@@ -17,7 +17,7 @@ class GroundComponent extends PositionComponent
   Future<void> onLoad() async {
     await super.onLoad();
 
-    final image = await gameRef.images.load(ImageAssets.ground);
+    final image = await game.images.load(ImageAssets.ground);
     final sprite = Sprite(image);
     final tileSize = Vector2(_tileWidth, _tileHeight);
 
@@ -35,7 +35,7 @@ class GroundComponent extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
-    final speed = gameRef.difficultySystem.speed;
+    final speed = game.difficultySystem.speed;
 
     for (final tile in [_tileA, _tileB]) {
       tile.position.x -= speed * dt;
