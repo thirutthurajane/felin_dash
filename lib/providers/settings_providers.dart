@@ -30,6 +30,12 @@ class SettingsNotifier extends StateNotifier<Settings> {
     await _repository.saveSettings(updated);
     state = updated;
   }
+
+  Future<void> setAllowLandscape({required bool allowed}) async {
+    final updated = state.copyWith(allowLandscape: allowed);
+    await _repository.saveSettings(updated);
+    state = updated;
+  }
 }
 
 final settingsProvider = StateNotifierProvider<SettingsNotifier, Settings>(
