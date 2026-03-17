@@ -20,6 +20,9 @@ abstract final class GameConstants {
   static const double catnipDuration = 5.0;
   static const double yarnDuration = 4.0;
 
+  // ── Milestones ───────────────────────────────────────────────────────────
+  static const double milestoneInterval = 500.0; // metres between milestones
+
   // ── Spawning ──────────────────────────────────────────────────────────────
   static const double minObstacleInterval = 0.8;
   static const double maxObstacleInterval = 2.5;

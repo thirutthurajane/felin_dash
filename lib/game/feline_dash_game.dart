@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 
 import '../core/constants.dart';
 import 'components/environment/ground_component.dart';
+import 'components/environment/milestone_flash_component.dart';
+import 'components/environment/parallax_background.dart';
 import 'components/player/cat_component.dart';
 import 'systems/difficulty_system.dart';
 
@@ -39,9 +41,11 @@ class FelineDashGame extends FlameGame
     await super.onLoad();
     debugMode = kDebugMode;
 
-    difficultySystem = DifficultySystem();
+    difficultySystem = DifficultySystem()
+      ..onMilestone = _onMilestone;
     await add(difficultySystem);
 
+    await add(ParallaxBackground());
     await add(GroundComponent());
 
     cat = CatComponent();
@@ -103,6 +107,10 @@ class FelineDashGame extends FlameGame
   }
 
   // ── Private helpers ──────────────────────────────────────────────────────
+
+  void _onMilestone(double distance) {
+    add(MilestoneFlashComponent(screenSize: size));
+  }
 
   void _playSfx(String path) {
     lastSfxRequested = path;
