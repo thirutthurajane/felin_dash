@@ -7,6 +7,9 @@ import 'package:flame_test/flame_test.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+// Swipe threshold used in FelineDashGame — must exceed this to trigger slide.
+const double _swipeThreshold = 50.0;
+
 void main() {
   final gameTester = FlameTester(FelineDashGame.new);
 
@@ -81,6 +84,76 @@ void main() {
         // Tap again — cat is in air, should not trigger jump or SFX
         await tester.tapAt(const Offset(200, 300));
         expect(game.lastSfxRequested, isNull);
+      },
+    );
+
+    // ── Swipe gesture tests ─────────────────────────────────────────────────
+
+    gameTester.testGameWidget(
+      'has DragCallbacks mixin',
+      verify: (game, tester) async {
+        expect(game, isA<DragCallbacks>());
+      },
+    );
+
+    gameTester.testGameWidget(
+      'downward swipe triggers cat slide when on ground',
+      verify: (game, tester) async {
+        game.sfxEnabled = false;
+        expect(game.cat.isOnGround, isTrue);
+        // Drag down by more than the swipe threshold
+        await tester.drag(
+          find.byType(GameWidget),
+          const Offset(0, _swipeThreshold + 10),
+        );
+        await tester.pump();
+        expect(game.cat.isSliding, isTrue);
+        expect(game.cat.state, equals(CatState.sliding));
+      },
+    );
+
+    gameTester.testGameWidget(
+      'downward swipe does not trigger slide when cat is airborne',
+      verify: (game, tester) async {
+        game.sfxEnabled = false;
+        game.cat.jump();
+        game.update(0.05);
+        await tester.drag(
+          find.byType(GameWidget),
+          const Offset(0, _swipeThreshold + 10),
+        );
+        await tester.pump();
+        expect(game.cat.isSliding, isFalse);
+      },
+    );
+
+    gameTester.testGameWidget(
+      'upward swipe ends slide early',
+      verify: (game, tester) async {
+        game.sfxEnabled = false;
+        game.cat.slide();
+        expect(game.cat.isSliding, isTrue);
+        // Drag up by more than the swipe threshold
+        await tester.drag(
+          find.byType(GameWidget),
+          const Offset(0, -(_swipeThreshold + 10)),
+        );
+        await tester.pump();
+        expect(game.cat.isSliding, isFalse);
+        expect(game.cat.state, equals(CatState.running));
+      },
+    );
+
+    gameTester.testGameWidget(
+      'drag shorter than threshold does not trigger slide',
+      verify: (game, tester) async {
+        game.sfxEnabled = false;
+        await tester.drag(
+          find.byType(GameWidget),
+          const Offset(0, _swipeThreshold - 10),
+        );
+        await tester.pump();
+        expect(game.cat.isSliding, isFalse);
       },
     );
   });
