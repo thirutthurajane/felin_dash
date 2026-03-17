@@ -191,5 +191,133 @@ void main() {
         expect(game.cat.canDoubleJump, isFalse);
       },
     );
+
+    // ── Slide tests ─────────────────────────────────────────────────────────
+
+    tester.testGameWidget(
+      'isSliding is false initially',
+      verify: (game, _) async {
+        expect(game.cat.isSliding, isFalse);
+      },
+    );
+
+    tester.testGameWidget(
+      'slide() sets state to sliding when on ground',
+      verify: (game, _) async {
+        game.cat.slide();
+        expect(game.cat.state, equals(CatState.sliding));
+      },
+    );
+
+    tester.testGameWidget(
+      'slide() sets isSliding to true',
+      verify: (game, _) async {
+        game.cat.slide();
+        expect(game.cat.isSliding, isTrue);
+      },
+    );
+
+    tester.testGameWidget(
+      'slide() is ignored when airborne',
+      verify: (game, _) async {
+        game.cat.jump();
+        game.update(0.05);
+        game.cat.slide();
+        expect(game.cat.isSliding, isFalse);
+        expect(game.cat.state, equals(CatState.jumping));
+      },
+    );
+
+    tester.testGameWidget(
+      'slide() is ignored when already sliding',
+      verify: (game, _) async {
+        game.cat.slide();
+        game.update(0.1); // slide timer ticking
+        game.cat.slide(); // second call ignored
+        // state is still sliding and timer was NOT reset (isSliding still true)
+        expect(game.cat.isSliding, isTrue);
+      },
+    );
+
+    tester.testGameWidget(
+      'hitbox height is halved during slide',
+      verify: (game, _) async {
+        game.cat.slide();
+        final hitbox = game.cat.children.whereType<RectangleHitbox>().first;
+        expect(
+          hitbox.size.y,
+          closeTo(SpriteConfig.catSlideFrameHeight, 0.1),
+        );
+      },
+    );
+
+    tester.testGameWidget(
+      'cat position.y adjusts to stay on ground during slide',
+      verify: (game, _) async {
+        game.cat.slide();
+        expect(
+          game.cat.position.y,
+          closeTo(
+            GameConstants.groundY - SpriteConfig.catSlideFrameHeight,
+            1.0,
+          ),
+        );
+      },
+    );
+
+    tester.testGameWidget(
+      'slide auto-ends after slideDuration and returns to running',
+      verify: (game, _) async {
+        game.cat.slide();
+        game.update(GameConstants.slideDuration + 0.01);
+        expect(game.cat.isSliding, isFalse);
+        expect(game.cat.state, equals(CatState.running));
+      },
+    );
+
+    tester.testGameWidget(
+      'hitbox height is restored after slide ends',
+      verify: (game, _) async {
+        game.cat.slide();
+        game.update(GameConstants.slideDuration + 0.01);
+        final hitbox = game.cat.children.whereType<RectangleHitbox>().first;
+        expect(
+          hitbox.size.y,
+          closeTo(SpriteConfig.catFrameHeight, 0.1),
+        );
+      },
+    );
+
+    tester.testGameWidget(
+      'cat position.y is restored to ground after slide ends',
+      verify: (game, _) async {
+        game.cat.slide();
+        game.update(GameConstants.slideDuration + 0.01);
+        expect(
+          game.cat.position.y,
+          closeTo(GameConstants.groundY - SpriteConfig.catFrameHeight, 1.0),
+        );
+      },
+    );
+
+    tester.testGameWidget(
+      'endSlide() is a no-op when not sliding',
+      verify: (game, _) async {
+        game.cat.endSlide(); // should not throw or change state
+        expect(game.cat.isSliding, isFalse);
+        expect(game.cat.state, equals(CatState.running));
+      },
+    );
+
+    tester.testGameWidget(
+      'endSlide() cancels slide early',
+      verify: (game, _) async {
+        game.cat.slide();
+        game.update(0.2); // well before slideDuration expires
+        game.cat.endSlide();
+        expect(game.cat.isSliding, isFalse);
+        expect(game.cat.state, equals(CatState.running));
+      },
+    );
   });
 }
