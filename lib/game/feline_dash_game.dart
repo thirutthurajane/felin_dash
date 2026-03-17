@@ -6,11 +6,14 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 
 import '../core/constants.dart';
+import 'components/collectibles/power_up_type.dart';
 import 'components/environment/ground_component.dart';
 import 'components/environment/milestone_flash_component.dart';
 import 'components/environment/parallax_background.dart';
 import 'components/player/cat_component.dart';
 import 'systems/difficulty_system.dart';
+import 'systems/score_system.dart';
+import 'systems/spawn_system.dart';
 
 /// Overlay key for the game-over screen.
 const String kGameOverOverlay = 'GameOver';
@@ -19,6 +22,13 @@ class FelineDashGame extends FlameGame
     with HasCollisionDetection, KeyboardEvents, TapCallbacks, DragCallbacks {
   late final DifficultySystem difficultySystem;
   late final CatComponent cat;
+  late final ScoreSystem scoreSystem;
+
+  /// Remaining lives. Starts at [GameConstants.startingLives].
+  int lives = GameConstants.startingLives;
+
+  /// Whether the cat is currently invincible (catnip power-up active).
+  bool isInvincible = false;
 
   /// Score (metres) captured when the cat dies.
   int finalScore = 0;
@@ -31,6 +41,15 @@ class FelineDashGame extends FlameGame
 
   /// Clears [lastSfxRequested]; used in tests to reset between assertions.
   void clearSfxLog() => lastSfxRequested = null;
+
+  // ── Power-up state ────────────────────────────────────────────────────────
+
+  PowerUpType? _activePowerUp;
+  double _powerUpTimer = 0.0;
+  double _speedMultiplier = 1.0;
+
+  /// World scroll speed after applying any active power-up multiplier.
+  double get effectiveSpeed => difficultySystem.speed * _speedMultiplier;
 
   // ── Swipe detection ──────────────────────────────────────────────────────
 
@@ -47,6 +66,8 @@ class FelineDashGame extends FlameGame
     await super.onLoad();
     debugMode = kDebugMode;
 
+    scoreSystem = ScoreSystem();
+
     difficultySystem = DifficultySystem()
       ..onMilestone = _onMilestone;
     await add(difficultySystem);
@@ -56,6 +77,45 @@ class FelineDashGame extends FlameGame
 
     cat = CatComponent();
     await add(cat);
+
+    await add(SpawnSystem());
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    scoreSystem.addDistanceScore(dt);
+    _tickPowerUp(dt);
+  }
+
+  // ── Collectible callbacks ─────────────────────────────────────────────────
+
+  /// Called by [CatComponent] when it overlaps a [FishToken].
+  void onFishCollected() {
+    scoreSystem.addFish();
+    _playSfx(AudioAssets.sfxCollectFish);
+  }
+
+  /// Activates a power-up, cancelling any previously active one.
+  ///
+  /// Only one power-up is active at a time — a new pickup replaces the current.
+  void activatePowerUp(PowerUpType type) {
+    _deactivatePowerUp();
+    _activePowerUp = type;
+
+    switch (type) {
+      case PowerUpType.catnip:
+        isInvincible = true;
+        _powerUpTimer = GameConstants.catnipDuration;
+      case PowerUpType.yarnBall:
+        _speedMultiplier = GameConstants.yarnSpeedMultiplier;
+        _powerUpTimer = GameConstants.yarnDuration;
+      case PowerUpType.milkBottle:
+        lives = (lives + 1).clamp(0, GameConstants.maxLives);
+        _activePowerUp = null; // instant — no timer
+    }
+
+    _playSfx(AudioAssets.sfxPowerUp);
   }
 
   // ── Tap input ────────────────────────────────────────────────────────────
@@ -115,10 +175,10 @@ class FelineDashGame extends FlameGame
   // ── Death handling ───────────────────────────────────────────────────────
 
   /// Called by [CatComponent] when it first collides with an obstacle.
-  /// Plays the death SFX and triggers the death animation; the game-over
-  /// overlay is shown once the animation completes.
+  ///
+  /// No-op if the cat is already dead or currently invincible (catnip).
   void handleCatDeath() {
-    if (cat.isDead) return;
+    if (cat.isDead || isInvincible) return;
 
     finalScore = difficultySystem.distanceTravelled.toInt();
     _playSfx(AudioAssets.sfxDeath);
@@ -141,5 +201,27 @@ class FelineDashGame extends FlameGame
     if (sfxEnabled) {
       FlameAudio.play(path);
     }
+  }
+
+  void _tickPowerUp(double dt) {
+    if (_activePowerUp == null) return;
+    _powerUpTimer -= dt;
+    if (_powerUpTimer <= 0) {
+      _deactivatePowerUp();
+    }
+  }
+
+  void _deactivatePowerUp() {
+    switch (_activePowerUp) {
+      case PowerUpType.catnip:
+        isInvincible = false;
+      case PowerUpType.yarnBall:
+        _speedMultiplier = 1.0;
+      case PowerUpType.milkBottle:
+      case null:
+        break;
+    }
+    _activePowerUp = null;
+    _powerUpTimer = 0.0;
   }
 }

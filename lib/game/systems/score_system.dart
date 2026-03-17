@@ -8,6 +8,7 @@ class ScoreSystem {
 
   int get score => _score;
   int get multiplier => _multiplier;
+  int get fishCount => _fishCount;
 
   void addDistanceScore(double dt) {
     _score += (GameConstants.scorePerMeter * dt * _multiplier).round();

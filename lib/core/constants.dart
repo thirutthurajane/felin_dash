@@ -33,6 +33,13 @@ abstract final class GameConstants {
 
   // ── Slide ─────────────────────────────────────────────────────────────────
   static const double slideDuration = 0.8; // seconds
+
+  // ── Collectible spawning ───────────────────────────────────────────────────
+  static const double minCollectibleInterval = 1.5;
+  static const double maxCollectibleInterval = 4.0;
+
+  // ── Yarn ball slowdown ─────────────────────────────────────────────────────
+  static const double yarnSpeedMultiplier = 0.5;
 }
 
 // ── Asset path constants ───────────────────────────────────────────────────
@@ -116,4 +123,10 @@ abstract final class SpriteConfig {
   static const double puddleHeight = 18.0;
   static const double puddleHitboxWidth = 88.0;
   static const double puddleHitboxHeight = 14.0;
+
+  // ── Collectibles ──────────────────────────────────────────────────────────
+  static const double fishTokenSize = 32.0;
+  static const double fishTokenHitboxRadius = 14.0;
+  static const double powerUpSize = 32.0;
+  static const double powerUpHitboxSize = 28.0;
 }
