@@ -11,10 +11,12 @@ import 'components/environment/milestone_flash_component.dart';
 import 'components/environment/parallax_background.dart';
 import 'components/player/cat_component.dart';
 import 'systems/difficulty_system.dart';
+import 'systems/spawn_system.dart';
 
 class FelineDashGame extends FlameGame
     with HasCollisionDetection, KeyboardEvents, TapCallbacks, DragCallbacks {
   late final DifficultySystem difficultySystem;
+  late final SpawnSystem spawnSystem;
   late final CatComponent cat;
 
   /// Set to false in tests to prevent FlameAudio from trying to load files.
@@ -47,6 +49,9 @@ class FelineDashGame extends FlameGame
 
     await add(ParallaxBackground());
     await add(GroundComponent());
+
+    spawnSystem = SpawnSystem();
+    await add(spawnSystem);
 
     cat = CatComponent();
     await add(cat);
