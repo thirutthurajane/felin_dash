@@ -33,7 +33,7 @@ class GroundComponent extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
-    final speed = game.difficultySystem.speed;
+    final speed = game.effectiveSpeed;
 
     for (final tile in [_tileA, _tileB]) {
       tile.position.x -= speed * dt;

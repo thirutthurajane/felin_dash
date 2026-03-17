@@ -3,6 +3,11 @@ import 'package:flame/components.dart';
 
 import '../../../core/constants.dart';
 import '../../feline_dash_game.dart';
+import '../collectibles/catnip_powerup.dart';
+import '../collectibles/fish_token.dart';
+import '../collectibles/milk_bottle.dart';
+import '../collectibles/power_up_type.dart';
+import '../collectibles/yarn_ball.dart';
 import '../obstacles/obstacle_component.dart';
 import 'cat_state.dart';
 
@@ -197,8 +202,21 @@ class CatComponent extends SpriteAnimationComponent
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
+
     if (other is ObstacleComponent && !_isDead) {
       game.handleCatDeath();
+    } else if (other is FishToken) {
+      game.onFishCollected();
+      other.removeFromParent();
+    } else if (other is CatnipPowerup) {
+      game.activatePowerUp(PowerUpType.catnip);
+      other.removeFromParent();
+    } else if (other is YarnBall) {
+      game.activatePowerUp(PowerUpType.yarnBall);
+      other.removeFromParent();
+    } else if (other is MilkBottle) {
+      game.activatePowerUp(PowerUpType.milkBottle);
+      other.removeFromParent();
     }
   }
 
