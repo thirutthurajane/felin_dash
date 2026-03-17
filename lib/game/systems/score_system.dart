@@ -10,8 +10,13 @@ class ScoreSystem {
   int get multiplier => _multiplier;
   int get fishCount => _fishCount;
 
+  /// Called whenever the score or multiplier changes.
+  /// Arguments: current score, current multiplier.
+  void Function(int score, int multiplier)? onScoreChanged;
+
   void addDistanceScore(double dt) {
     _score += (GameConstants.scorePerMeter * dt * _multiplier).round();
+    onScoreChanged?.call(_score, _multiplier);
   }
 
   void addFish() {
@@ -20,6 +25,7 @@ class ScoreSystem {
     if (_fishCount % GameConstants.multiplierFishThreshold == 0) {
       _multiplier++;
     }
+    onScoreChanged?.call(_score, _multiplier);
   }
 
   void reset() {
