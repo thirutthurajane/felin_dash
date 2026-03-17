@@ -42,7 +42,7 @@ class FelineDashGame extends FlameGame
 
   @override
   void onTapDown(TapDownEvent event) {
-    if (cat.isOnGround) {
+    if (cat.canJump) {
       cat.jump();
       _playSfx(AudioAssets.sfxJump);
     }

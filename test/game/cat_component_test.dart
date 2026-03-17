@@ -113,24 +113,82 @@ void main() {
       },
     );
 
+    // ── Double-jump tests ───────────────────────────────────────────────────
+
     tester.testGameWidget(
-      'jump() is ignored when already in air',
+      'canDoubleJump is false initially',
+      verify: (game, _) async {
+        expect(game.cat.canDoubleJump, isFalse);
+      },
+    );
+
+    tester.testGameWidget(
+      'jump() from ground sets canDoubleJump to true',
       verify: (game, _) async {
         game.cat.jump();
-        final velocityAfterFirstJump = game.cat.velocityY;
-        game.update(0.05); // Move into air
-        game.cat.jump(); // Should be ignored
-        // Gravity has been applied for 0.05s, so velocity should be
-        // jumpImpulse + gravity*dt, NOT a fresh jumpImpulse
+        expect(game.cat.canDoubleJump, isTrue);
+      },
+    );
+
+    tester.testGameWidget(
+      'second tap mid-air applies doubleJumpImpulse to velocityY',
+      verify: (game, _) async {
+        game.cat.jump();
+        game.update(0.05); // move into air
+        game.cat.jump(); // double jump
         expect(
           game.cat.velocityY,
-          isNot(closeTo(GameConstants.jumpImpulse, 0.1)),
+          closeTo(GameConstants.doubleJumpImpulse, 0.1),
         );
+      },
+    );
+
+    tester.testGameWidget(
+      'second tap mid-air sets state to doubleJumping',
+      verify: (game, _) async {
+        game.cat.jump();
+        game.update(0.05);
+        game.cat.jump();
+        expect(game.cat.state, equals(CatState.doubleJumping));
+      },
+    );
+
+    tester.testGameWidget(
+      'second tap mid-air sets canDoubleJump to false',
+      verify: (game, _) async {
+        game.cat.jump();
+        game.update(0.05);
+        game.cat.jump();
+        expect(game.cat.canDoubleJump, isFalse);
+      },
+    );
+
+    tester.testGameWidget(
+      'third tap mid-air is ignored',
+      verify: (game, _) async {
+        game.cat.jump();
+        game.update(0.05);
+        game.cat.jump(); // double jump
+        final velocityAfterDoubleJump = game.cat.velocityY;
+        game.update(0.05);
+        game.cat.jump(); // third tap — must be ignored
+        // velocity should only reflect gravity applied, not a new impulse
         expect(
           game.cat.velocityY,
           closeTo(
-              velocityAfterFirstJump + GameConstants.gravity * 0.05, 1.0),
+              velocityAfterDoubleJump + GameConstants.gravity * 0.05, 1.0),
         );
+      },
+    );
+
+    tester.testGameWidget(
+      'canDoubleJump resets to false on landing',
+      verify: (game, _) async {
+        game.cat.jump(); // first jump, canDoubleJump = true
+        // land without double jumping
+        game.update(2.0);
+        expect(game.cat.isOnGround, isTrue);
+        expect(game.cat.canDoubleJump, isFalse);
       },
     );
   });
