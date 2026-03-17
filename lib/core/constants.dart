@@ -92,8 +92,28 @@ abstract final class SpriteConfig {
   static const double catFrameHeight = 64.0;
   static const double catSlideFrameHeight = 32.0; // half-height during slide
 
-  // Obstacle animations
+  // ── Dog obstacle ──────────────────────────────────────────────────────────
   static const int dogRunFrames = 6;
   static const double dogFrameWidth = 64.0;
   static const double dogFrameHeight = 64.0;
+  static const double dogHitboxWidth = 56.0;
+  static const double dogHitboxHeight = 60.0;
+
+  // ── Bin obstacle ──────────────────────────────────────────────────────────
+  static const double binWidth = 48.0;
+  static const double binHeight = 48.0;
+  static const double binHitboxWidth = 44.0;
+  static const double binHitboxHeight = 46.0;
+
+  // ── Fence obstacle ────────────────────────────────────────────────────────
+  static const double fenceWidth = 80.0;
+  static const double fenceHeight = 32.0;
+  static const double fenceHitboxWidth = 76.0;
+  static const double fenceHitboxHeight = 28.0;
+
+  // ── Puddle obstacle ───────────────────────────────────────────────────────
+  static const double puddleWidth = 96.0;
+  static const double puddleHeight = 18.0;
+  static const double puddleHitboxWidth = 88.0;
+  static const double puddleHitboxHeight = 14.0;
 }
