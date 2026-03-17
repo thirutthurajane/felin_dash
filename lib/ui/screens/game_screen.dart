@@ -2,6 +2,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 
 import '../../game/feline_dash_game.dart';
+import '../../game/overlays/game_over_overlay.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -23,7 +24,10 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     return GameWidget<FelineDashGame>(
       game: _game,
-      overlayBuilderMap: const {},
+      overlayBuilderMap: {
+        kGameOverOverlay: (context, game) =>
+            GameOverOverlay(game: game),
+      },
     );
   }
 }

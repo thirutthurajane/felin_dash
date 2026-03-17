@@ -12,10 +12,16 @@ import 'components/environment/parallax_background.dart';
 import 'components/player/cat_component.dart';
 import 'systems/difficulty_system.dart';
 
+/// Overlay key for the game-over screen.
+const String kGameOverOverlay = 'GameOver';
+
 class FelineDashGame extends FlameGame
     with HasCollisionDetection, KeyboardEvents, TapCallbacks, DragCallbacks {
   late final DifficultySystem difficultySystem;
   late final CatComponent cat;
+
+  /// Score (metres) captured when the cat dies.
+  int finalScore = 0;
 
   /// Set to false in tests to prevent FlameAudio from trying to load files.
   bool sfxEnabled = true;
@@ -104,6 +110,24 @@ class FelineDashGame extends FlameGame
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
+  }
+
+  // ── Death handling ───────────────────────────────────────────────────────
+
+  /// Called by [CatComponent] when it first collides with an obstacle.
+  /// Plays the death SFX and triggers the death animation; the game-over
+  /// overlay is shown once the animation completes.
+  void handleCatDeath() {
+    if (cat.isDead) return;
+
+    finalScore = difficultySystem.distanceTravelled.toInt();
+    _playSfx(AudioAssets.sfxDeath);
+    cat.die();
+  }
+
+  /// Called by [CatComponent] after the death animation finishes.
+  void onDeathAnimationComplete() {
+    overlays.add(kGameOverOverlay);
   }
 
   // ── Private helpers ──────────────────────────────────────────────────────
