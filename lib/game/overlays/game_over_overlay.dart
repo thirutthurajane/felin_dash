@@ -35,6 +35,7 @@ class GameOverOverlay extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 game.overlays.remove(kGameOverOverlay);
+                game.resetGame();
                 game.resumeEngine();
               },
               child: const Text('Retry'),
