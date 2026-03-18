@@ -240,7 +240,7 @@ class FelineDashGame extends FlameGame
   // ── Private helpers ──────────────────────────────────────────────────────
 
   void _onMilestone(double distance) {
-    add(MilestoneFlashComponent(screenSize: size));
+    // add(MilestoneFlashComponent(screenSize: size));
   }
 
   void _playSfx(String path) {
