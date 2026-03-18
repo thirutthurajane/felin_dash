@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flutter/painting.dart';
 
 import '../../../core/constants.dart';
 import '../../feline_dash_game.dart';
@@ -28,6 +29,19 @@ class GroundComponent extends PositionComponent
 
     position = Vector2(0, GameConstants.groundY);
     size = Vector2(_tileWidth * 2, _tileHeight);
+
+    // Fill the area below the visible ground tile with an earth colour so no
+    // blue sky background bleeds through on tall screens.
+    final belowHeight = game.size.y - GameConstants.groundY - _tileHeight;
+    if (belowHeight > 0) {
+      add(
+        RectangleComponent(
+          position: Vector2(0, _tileHeight),
+          size: Vector2(game.size.x, belowHeight + 1),
+          paint: Paint()..color = const Color(0xFF6B4F3A),
+        ),
+      );
+    }
   }
 
   @override

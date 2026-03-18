@@ -34,6 +34,14 @@ class SpawnSystem extends Component with HasGameReference<FelineDashGame> {
     _nextCollectibleInterval = _computeCollectibleInterval();
   }
 
+  /// Reset spawn timers for a new game.
+  void reset() {
+    _obstacleElapsed = 0.0;
+    _collectibleElapsed = 0.0;
+    _nextObstacleInterval = _computeObstacleInterval();
+    _nextCollectibleInterval = _computeCollectibleInterval();
+  }
+
   @override
   void update(double dt) {
     super.update(dt);

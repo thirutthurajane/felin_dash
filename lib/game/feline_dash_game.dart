@@ -15,6 +15,8 @@ import 'components/hud/hud_component.dart';
 import 'components/player/cat_component.dart';
 import 'systems/difficulty_system.dart';
 import 'systems/score_system.dart';
+import 'components/collectibles/collectible_component.dart';
+import 'components/obstacles/obstacle_component.dart';
 import 'systems/spawn_system.dart';
 
 /// Overlay key for the game-over screen.
@@ -25,6 +27,7 @@ class FelineDashGame extends FlameGame
   late final DifficultySystem difficultySystem;
   late final CatComponent cat;
   late final ScoreSystem scoreSystem;
+  late final SpawnSystem spawnSystem;
 
   /// Remaining lives. Starts at [GameConstants.startingLives].
   int lives = GameConstants.startingLives;
@@ -83,7 +86,8 @@ class FelineDashGame extends FlameGame
     cat = CatComponent();
     await add(cat);
 
-    await add(SpawnSystem());
+    spawnSystem = SpawnSystem();
+    await add(spawnSystem);
 
     camera.viewport.add(HudComponent());
   }
@@ -124,6 +128,39 @@ class FelineDashGame extends FlameGame
     }
 
     _playSfx(AudioAssets.sfxPowerUp);
+  }
+
+  // ── Game reset ───────────────────────────────────────────────────────────
+
+  /// Resets all game state back to initial values so the player can retry.
+  ///
+  /// Removes all in-flight obstacles and collectibles, resets the cat, score,
+  /// difficulty, and power-up state.
+  void resetGame() {
+    // Remove all obstacles and collectibles that are currently on screen.
+    children
+        .whereType<ObstacleComponent>()
+        .toList()
+        .forEach((c) => c.removeFromParent());
+    children
+        .whereType<CollectibleComponent>()
+        .toList()
+        .forEach((c) => c.removeFromParent());
+
+    // Reset systems.
+    scoreSystem.reset();
+    difficultySystem.reset();
+    spawnSystem.reset();
+
+    // Reset game-level state.
+    lives = GameConstants.startingLives;
+    isInvincible = false;
+    finalScore = 0;
+    _deactivatePowerUp();
+    onLivesChanged?.call(lives);
+
+    // Reset the cat last so it starts running again.
+    cat.reset();
   }
 
   // ── Tap input ────────────────────────────────────────────────────────────

@@ -18,6 +18,13 @@ class DifficultySystem extends Component {
   /// The argument is the milestone distance crossed.
   void Function(double distance)? onMilestone;
 
+  /// Reset speed and distance back to initial values for a new game.
+  void reset() {
+    speed = GameConstants.initialSpeed;
+    _distanceTravelled = 0;
+    _lastMilestone = 0;
+  }
+
   @override
   void update(double dt) {
     super.update(dt);

@@ -166,6 +166,26 @@ class CatComponent extends SpriteAnimationComponent
     _hitbox.position = Vector2.zero();
   }
 
+  /// Reset the cat to its initial running state.
+  /// Called by [FelineDashGame.resetGame] on retry.
+  void reset() {
+    _isDead = false;
+    _isOnGround = true;
+    _velocityY = 0.0;
+    _canDoubleJump = false;
+    _isSliding = false;
+    _slideTimer = 0.0;
+    state = CatState.running;
+
+    animation = _runAnimation;
+    size = Vector2(SpriteConfig.catFrameWidth, SpriteConfig.catFrameHeight);
+    position = Vector2(fixedX, GameConstants.groundY - SpriteConfig.catFrameHeight);
+
+    _hitbox.size =
+        Vector2(SpriteConfig.catFrameWidth, SpriteConfig.catFrameHeight);
+    _hitbox.position = Vector2.zero();
+  }
+
   /// Play the death animation and freeze all physics/input.
   /// After the animation completes, [FelineDashGame.handleCatDeath] is called.
   void die() {
