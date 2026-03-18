@@ -10,6 +10,7 @@ import 'components/collectibles/power_up_type.dart';
 import 'components/environment/ground_component.dart';
 import 'components/environment/milestone_flash_component.dart';
 import 'components/environment/parallax_background.dart';
+import 'components/hud/hud_component.dart';
 import 'components/player/cat_component.dart';
 import 'systems/difficulty_system.dart';
 import 'systems/score_system.dart';
@@ -32,6 +33,9 @@ class FelineDashGame extends FlameGame
 
   /// Score (metres) captured when the cat dies.
   int finalScore = 0;
+
+  /// Called whenever [lives] changes. Used by [LifeDisplay] to update icons.
+  void Function(int lives)? onLivesChanged;
 
   /// Set to false in tests to prevent FlameAudio from trying to load files.
   bool sfxEnabled = true;
@@ -79,6 +83,8 @@ class FelineDashGame extends FlameGame
     await add(cat);
 
     await add(SpawnSystem());
+
+    camera.viewport.add(HudComponent());
   }
 
   @override
@@ -112,6 +118,7 @@ class FelineDashGame extends FlameGame
         _powerUpTimer = GameConstants.yarnDuration;
       case PowerUpType.milkBottle:
         lives = (lives + 1).clamp(0, GameConstants.maxLives);
+        onLivesChanged?.call(lives);
         _activePowerUp = null; // instant — no timer
     }
 
