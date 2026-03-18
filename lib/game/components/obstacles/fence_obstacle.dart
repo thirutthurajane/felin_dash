@@ -14,14 +14,14 @@ class FenceObstacle extends ObstacleComponent {
   Future<void> onLoad() async {
     await super.onLoad(); // adds RectangleHitbox via ObstacleComponent
 
-    final image = await gameRef.images.load(ImageAssets.fenceObstacle);
+    final image = await game.images.load(ImageAssets.fenceObstacle);
     add(SpriteComponent(
       sprite: Sprite(image),
       size: Vector2(SpriteConfig.fenceWidth, SpriteConfig.fenceHeight),
     ));
 
     size = Vector2(SpriteConfig.fenceWidth, SpriteConfig.fenceHeight);
-    position = Vector2(gameRef.size.x, 0);
+    position = Vector2(game.size.x, 0);
     placeOnGround();
   }
 }

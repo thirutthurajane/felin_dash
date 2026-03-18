@@ -4,6 +4,7 @@ import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 import '../core/constants.dart';
 import 'components/collectibles/power_up_type.dart';
@@ -139,16 +140,18 @@ class FelineDashGame extends FlameGame
 
   @override
   void onDragStart(DragStartEvent event) {
+    super.onDragStart(event);
     _dragDeltaY = 0.0;
   }
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
-    _dragDeltaY += event.delta.y;
+    _dragDeltaY += event.deviceDelta.y;
   }
 
   @override
   void onDragEnd(DragEndEvent event) {
+    super.onDragEnd(event);
     if (_dragDeltaY > _swipeThreshold) {
       // Swipe down → slide
       cat.slide();

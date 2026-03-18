@@ -16,7 +16,7 @@ abstract class CollectibleComponent extends SpriteComponent
   @override
   void update(double dt) {
     super.update(dt);
-    position.x -= gameRef.effectiveSpeed * dt;
+    position.x -= game.effectiveSpeed * dt;
     if (position.x < -width) removeFromParent();
   }
 }

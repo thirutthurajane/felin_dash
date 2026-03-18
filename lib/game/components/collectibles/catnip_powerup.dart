@@ -20,7 +20,7 @@ class CatnipPowerup extends CollectibleComponent {
   Future<void> onLoad() async {
     await super.onLoad();
 
-    final img = await gameRef.images.load(ImageAssets.catnipPowerUp);
+    final img = await game.images.load(ImageAssets.catnipPowerUp);
     sprite = Sprite(img);
 
     position.y = GameConstants.groundY - SpriteConfig.powerUpSize;

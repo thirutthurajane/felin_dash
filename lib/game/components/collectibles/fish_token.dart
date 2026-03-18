@@ -20,7 +20,7 @@ class FishToken extends CollectibleComponent {
   Future<void> onLoad() async {
     await super.onLoad();
 
-    final img = await gameRef.images.load(ImageAssets.fishToken);
+    final img = await game.images.load(ImageAssets.fishToken);
     sprite = Sprite(img);
 
     // Place token so its bottom edge rests on the ground.

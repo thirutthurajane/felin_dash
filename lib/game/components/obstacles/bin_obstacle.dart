@@ -14,14 +14,14 @@ class BinObstacle extends ObstacleComponent {
   Future<void> onLoad() async {
     await super.onLoad(); // adds RectangleHitbox via ObstacleComponent
 
-    final image = await gameRef.images.load(ImageAssets.binObstacle);
+    final image = await game.images.load(ImageAssets.binObstacle);
     add(SpriteComponent(
       sprite: Sprite(image),
       size: Vector2(SpriteConfig.binWidth, SpriteConfig.binHeight),
     ));
 
     size = Vector2(SpriteConfig.binWidth, SpriteConfig.binHeight);
-    position = Vector2(gameRef.size.x, 0);
+    position = Vector2(game.size.x, 0);
     placeOnGround();
   }
 }

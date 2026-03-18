@@ -59,7 +59,7 @@ class SpawnSystem extends Component with HasGameReference<FelineDashGame> {
   double _computeObstacleInterval() {
     final speedRange =
         GameConstants.maxSpeed - GameConstants.initialSpeed;
-    final t = ((gameRef.difficultySystem.speed - GameConstants.initialSpeed) /
+    final t = ((game.difficultySystem.speed - GameConstants.initialSpeed) /
             speedRange)
         .clamp(0.0, 1.0);
     return lerpDouble(
@@ -85,22 +85,22 @@ class SpawnSystem extends Component with HasGameReference<FelineDashGame> {
       2 => FenceObstacle(),
       _ => PuddleObstacle(),
     };
-    gameRef.add(obstacle);
+    game.add(obstacle);
   }
 
   void _spawnCollectible() {
-    final spawnX = gameRef.size.x + SpriteConfig.fishTokenSize;
+    final spawnX = game.size.x + SpriteConfig.fishTokenSize;
 
     // 70 % chance of a fish token, 10 % each for the three power-ups.
     final roll = _rng.nextDouble();
     if (roll < 0.70) {
-      gameRef.add(FishToken(spawnX: spawnX));
+      game.add(FishToken(spawnX: spawnX));
     } else if (roll < 0.80) {
-      gameRef.add(CatnipPowerup(spawnX: spawnX));
+      game.add(CatnipPowerup(spawnX: spawnX));
     } else if (roll < 0.90) {
-      gameRef.add(YarnBall(spawnX: spawnX));
+      game.add(YarnBall(spawnX: spawnX));
     } else {
-      gameRef.add(MilkBottle(spawnX: spawnX));
+      game.add(MilkBottle(spawnX: spawnX));
     }
   }
 }

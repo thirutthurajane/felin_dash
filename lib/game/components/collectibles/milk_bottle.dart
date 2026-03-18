@@ -20,7 +20,7 @@ class MilkBottle extends CollectibleComponent {
   Future<void> onLoad() async {
     await super.onLoad();
 
-    final img = await gameRef.images.load(ImageAssets.milkBottle);
+    final img = await game.images.load(ImageAssets.milkBottle);
     sprite = Sprite(img);
 
     position.y = GameConstants.groundY - SpriteConfig.powerUpSize;

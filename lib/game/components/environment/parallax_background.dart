@@ -10,10 +10,10 @@ class ParallaxBackground extends ParallaxComponent<FelineDashGame> {
   Future<void> onLoad() async {
     parallax = await game.loadParallax(
       [
-        ParallaxImageData('environment/sky.png'),
-        ParallaxImageData('environment/buildings_far.png'),
-        ParallaxImageData('environment/buildings_near.png'),
-        ParallaxImageData('environment/ground_detail.png'),
+        // ParallaxImageData('environment/sky.png'),
+        // ParallaxImageData('environment/buildings_far.png'),
+        // ParallaxImageData('environment/buildings_near.png'),
+        // ParallaxImageData('environment/ground_detail.png'),
       ],
       baseVelocity: Vector2(30, 0),
       velocityMultiplierDelta: Vector2(1.4, 0),

@@ -14,7 +14,7 @@ class DogObstacle extends ObstacleComponent {
   Future<void> onLoad() async {
     await super.onLoad(); // adds RectangleHitbox via ObstacleComponent
 
-    final sheet = await gameRef.images.load(ImageAssets.dogRun);
+    final sheet = await game.images.load(ImageAssets.dogRun);
     final animation = SpriteAnimation.fromFrameData(
       sheet,
       SpriteAnimationData.sequenced(
@@ -31,7 +31,7 @@ class DogObstacle extends ObstacleComponent {
     ));
 
     size = Vector2(SpriteConfig.dogFrameWidth, SpriteConfig.dogFrameHeight);
-    position = Vector2(gameRef.size.x, 0);
+    position = Vector2(game.size.x, 0);
     placeOnGround();
   }
 }
