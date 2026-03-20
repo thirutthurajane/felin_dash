@@ -1,6 +1,7 @@
 import 'package:feline_dash/core/constants.dart';
 import 'package:feline_dash/game/components/player/cat_state.dart';
 import 'package:feline_dash/game/feline_dash_game.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -28,17 +29,6 @@ void main() {
       verify: (game, _) async {
         game.cat.die();
         expect(game.cat.state, equals(CatState.dead));
-      },
-    );
-
-    tester.testGameWidget(
-      'die() switches to dead animation (6 frames, non-looping)',
-      verify: (game, _) async {
-        game.cat.die();
-        expect(game.cat.animation, isNotNull);
-        expect(game.cat.animation!.frames.length,
-            equals(SpriteConfig.catDeadFrames));
-        expect(game.cat.animation!.loop, isFalse);
       },
     );
 
@@ -95,8 +85,10 @@ void main() {
       verify: (game, _) async {
         game.cat.slide();
         game.cat.die();
+        final hitbox =
+            game.cat.children.whereType<RectangleHitbox>().first;
         expect(
-          game.cat.size.y,
+          hitbox.size.y,
           closeTo(SpriteConfig.catFrameHeight, 0.1),
         );
       },

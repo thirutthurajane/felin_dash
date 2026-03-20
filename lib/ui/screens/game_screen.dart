@@ -2,7 +2,10 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 
 import '../../game/feline_dash_game.dart';
+import '../../game/overlays/countdown_overlay.dart';
 import '../../game/overlays/game_over_overlay.dart';
+import '../../game/overlays/hud_overlay.dart';
+import '../../game/overlays/pause_overlay.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -25,9 +28,12 @@ class _GameScreenState extends State<GameScreen> {
     return GameWidget<FelineDashGame>(
       game: _game,
       overlayBuilderMap: {
-        kGameOverOverlay: (context, game) =>
-            GameOverOverlay(game: game),
+        kHudOverlay: (context, game) => HudOverlay(game: game),
+        kGameOverOverlay: (context, game) => GameOverOverlay(game: game),
+        kPauseOverlay: (context, game) => PauseOverlay(game: game),
+        kCountdownOverlay: (context, game) => CountdownOverlay(game: game),
       },
+      initialActiveOverlays: const [kHudOverlay],
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/theme.dart';
 import 'providers/settings_providers.dart';
 import 'ui/screens/game_screen.dart';
 
@@ -26,10 +27,11 @@ class FelineDashApp extends ConsumerWidget {
 
     SystemChrome.setPreferredOrientations(orientations);
 
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Feline Dash',
       debugShowCheckedModeBanner: false,
-      home: GameScreen(),
+      theme: FelineDashTheme.themeData,
+      home: const GameScreen(),
     );
   }
 }

@@ -42,6 +42,31 @@ abstract final class GameConstants {
   static const double yarnSpeedMultiplier = 0.5;
 }
 
+// ── Theme colors (matching mockup palette) ────────────────────────────────
+
+abstract final class ThemeColors {
+  static const Color gameBackground = Color(0xFFFFF5ED);
+  static const Color primary = Color(0xFF8A4C00);
+  static const Color primaryContainer = Color(0xFFFD9000);
+  static const Color catBody = Color(0xFFEA8400);
+  static const Color catBodyDark = Color(0xFF794200);
+  static const Color catHead = Color(0xFFFD9000);
+  static const Color catEye = Color(0xFF1E0C00);
+  static const Color surfaceContainer = Color(0xFFFFE4C7);
+  static const Color surfaceContainerHighest = Color(0xFFFFD6A7);
+  static const Color secondary = Color(0xFF006859);
+  static const Color secondaryDark = Color(0xFF005D4F);
+  static const Color tertiary = Color(0xFF652FE7);
+  static const Color tertiaryContainer = Color(0xFFB8A3FF);
+  static const Color outline = Color(0xFF976F3E);
+  static const Color outlineVariant = Color(0xFFD3A56E);
+  static const Color floor = Color(0xFFFFEEDE);
+  static const Color onSurface = Color(0xFF442900);
+  static const Color onSurfaceVariant = Color(0xFF785425);
+  static const Color error = Color(0xFFB02500);
+  static const Color shadow = Color(0x1A442900);
+}
+
 // ── Asset path constants ───────────────────────────────────────────────────
 
 abstract final class AudioAssets {
