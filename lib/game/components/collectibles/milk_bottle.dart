@@ -1,6 +1,7 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flutter/painting.dart';
 
 import '../../../core/constants.dart';
 import 'collectible_component.dart';
@@ -9,6 +10,7 @@ import 'collectible_component.dart';
 ///
 /// Collision is handled by [CatComponent] which calls
 /// [FelineDashGame.activatePowerUp(PowerUpType.milkBottle)].
+/// Rendered procedurally with geometric shapes matching the game's theme.
 class MilkBottle extends CollectibleComponent {
   MilkBottle({required double spawnX})
       : super(
@@ -20,10 +22,35 @@ class MilkBottle extends CollectibleComponent {
   Future<void> onLoad() async {
     await super.onLoad();
 
-    final img = await game.images.load(ImageAssets.milkBottle);
-    sprite = Sprite(img);
-
     position.y = GameConstants.groundY - SpriteConfig.powerUpSize;
+
+    // Cap
+    add(RectangleComponent(
+      position: Vector2(10, 0),
+      size: Vector2(12, 4),
+      paint: Paint()..color = ThemeColors.outline,
+    ));
+
+    // Neck
+    add(RectangleComponent(
+      position: Vector2(11, 4),
+      size: Vector2(10, 8),
+      paint: Paint()..color = ThemeColors.surfaceContainerHighest,
+    ));
+
+    // Bottle body
+    add(RectangleComponent(
+      position: Vector2(7, 12),
+      size: Vector2(18, 20),
+      paint: Paint()..color = ThemeColors.surfaceContainer,
+    ));
+
+    // Label
+    add(RectangleComponent(
+      position: Vector2(9, 18),
+      size: Vector2(14, 8),
+      paint: Paint()..color = ThemeColors.primaryContainer.withValues(alpha: 0.3),
+    ));
 
     add(
       RectangleHitbox(
