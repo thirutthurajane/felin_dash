@@ -4,56 +4,41 @@ import 'package:flutter/painting.dart';
 import '../../../core/constants.dart';
 import '../../feline_dash_game.dart';
 
+/// Procedural warm-toned floor surface matching the indoor living room theme.
 class GroundComponent extends PositionComponent
     with HasGameReference<FelineDashGame> {
-  static const double _tileHeight = 80.0;
-
-  late double _tileWidth;
-  late final SpriteComponent _tileA;
-  late final SpriteComponent _tileB;
+  static const double _floorHeight = 80.0;
+  static const double _borderHeight = 4.0;
+  static const double _shadowHeight = 8.0;
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
 
-    _tileWidth = game.size.x;
-    final sprite = await Sprite.load(ImageAssets.ground);
-    final tileSize = Vector2(_tileWidth, _tileHeight);
-
-    _tileA = SpriteComponent(sprite: sprite, size: tileSize)
-      ..position = Vector2(0, 0);
-    _tileB = SpriteComponent(sprite: sprite, size: tileSize)
-      ..position = Vector2(_tileWidth, 0);
-
-    addAll([_tileA, _tileB]);
+    final screenWidth = game.size.x;
 
     position = Vector2(0, GameConstants.groundY);
-    size = Vector2(_tileWidth * 2, _tileHeight);
+    size = Vector2(screenWidth, _floorHeight + game.size.y - GameConstants.groundY);
 
-    // Fill the area below the visible ground tile with an earth colour so no
-    // blue sky background bleeds through on tall screens.
-    final belowHeight = game.size.y - GameConstants.groundY - _tileHeight;
-    if (belowHeight > 0) {
-      add(
-        RectangleComponent(
-          position: Vector2(0, _tileHeight),
-          size: Vector2(game.size.x, belowHeight + 1),
-          paint: Paint()..color = const Color(0xFF6B4F3A),
-        ),
-      );
-    }
-  }
+    // Top border line (matching mockup's border-t-4 border-outline-variant/30)
+    add(RectangleComponent(
+      position: Vector2.zero(),
+      size: Vector2(screenWidth, _borderHeight),
+      paint: Paint()..color = ThemeColors.outlineVariant.withValues(alpha: 0.3),
+    ));
 
-  @override
-  void update(double dt) {
-    super.update(dt);
-    final speed = game.effectiveSpeed;
+    // Subtle shadow gradient below border
+    add(RectangleComponent(
+      position: Vector2(0, _borderHeight),
+      size: Vector2(screenWidth, _shadowHeight),
+      paint: Paint()..color = ThemeColors.onSurface.withValues(alpha: 0.05),
+    ));
 
-    for (final tile in [_tileA, _tileB]) {
-      tile.position.x -= speed * dt;
-      if (tile.position.x + _tileWidth <= 0) {
-        tile.position.x += _tileWidth * 2;
-      }
-    }
+    // Floor surface
+    add(RectangleComponent(
+      position: Vector2(0, _borderHeight),
+      size: Vector2(screenWidth, _floorHeight + game.size.y - GameConstants.groundY),
+      paint: Paint()..color = ThemeColors.floor,
+    ));
   }
 }

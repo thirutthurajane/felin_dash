@@ -1,144 +1,88 @@
 import 'package:feline_dash/core/constants.dart';
 import 'package:feline_dash/game/components/collectibles/power_up_type.dart';
-import 'package:feline_dash/game/components/hud/hud_component.dart';
-import 'package:feline_dash/game/components/hud/life_display.dart';
-import 'package:feline_dash/game/components/hud/score_display.dart';
 import 'package:feline_dash/game/feline_dash_game.dart';
-import 'package:flame/components.dart';
-import 'package:flame_test/flame_test.dart';
+import 'package:feline_dash/game/overlays/hud_overlay.dart';
+import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final tester = FlameTester(FelineDashGame.new);
+  late FelineDashGame game;
 
-  group('HudComponent', () {
-    tester.testGameWidget(
-      'is added to camera viewport',
-      verify: (game, _) async {
-        final huds =
-            game.camera.viewport.children.whereType<HudComponent>();
-        expect(huds, isNotEmpty);
-      },
-    );
-
-    tester.testGameWidget(
-      'contains a ScoreDisplay child',
-      verify: (game, _) async {
-        final hud =
-            game.camera.viewport.children.whereType<HudComponent>().first;
-        expect(hud.children.whereType<ScoreDisplay>(), isNotEmpty);
-      },
-    );
-
-    tester.testGameWidget(
-      'contains a LifeDisplay child',
-      verify: (game, _) async {
-        final hud =
-            game.camera.viewport.children.whereType<HudComponent>().first;
-        expect(hud.children.whereType<LifeDisplay>(), isNotEmpty);
-      },
-    );
+  setUp(() {
+    game = FelineDashGame();
+    game.sfxEnabled = false;
   });
 
-  group('ScoreDisplay', () {
-    ScoreDisplay _scoreDisplay(FelineDashGame game) => game
-        .camera.viewport.children
-        .whereType<HudComponent>()
-        .first
-        .children
-        .whereType<ScoreDisplay>()
-        .first;
+  group('HudOverlay', () {
+    testWidgets('renders distance counter', (tester) async {
+      game.distanceNotifier.value = 145;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HudOverlay(game: game),
+          ),
+        ),
+      );
+      expect(find.text('145'), findsOneWidget);
+      expect(find.text('m'), findsOneWidget);
+    });
 
-    tester.testGameWidget(
-      'shows Score: 0 initially',
-      verify: (game, _) async {
-        final texts =
-            _scoreDisplay(game).children.whereType<TextComponent>().toList();
-        expect(texts.first.text, equals('Score: 0'));
-      },
-    );
+    testWidgets('renders fish counter', (tester) async {
+      game.fishCountNotifier.value = 12;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HudOverlay(game: game),
+          ),
+        ),
+      );
+      expect(find.text('x12'), findsOneWidget);
+    });
 
-    tester.testGameWidget(
-      'updates score text when fish is collected',
-      verify: (game, _) async {
-        game.sfxEnabled = false;
-        game.onFishCollected();
-        final texts =
-            _scoreDisplay(game).children.whereType<TextComponent>().toList();
-        expect(texts.first.text,
-            equals('Score: ${GameConstants.fishTokenValue}'));
-      },
-    );
+    testWidgets('distance counter updates when notifier changes',
+        (tester) async {
+      game.distanceNotifier.value = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HudOverlay(game: game),
+          ),
+        ),
+      );
+      expect(find.text('0'), findsOneWidget);
 
-    tester.testGameWidget(
-      'shows multiplier badge text when multiplier exceeds 1',
-      verify: (game, _) async {
-        game.sfxEnabled = false;
-        for (var i = 0; i < GameConstants.multiplierFishThreshold; i++) {
-          game.onFishCollected();
-        }
-        final texts =
-            _scoreDisplay(game).children.whereType<TextComponent>().toList();
-        // second TextComponent is the multiplier badge
-        expect(texts.last.text, equals('x2'));
-      },
-    );
+      game.distanceNotifier.value = 250;
+      await tester.pump();
+      expect(find.text('250'), findsOneWidget);
+    });
 
-    tester.testGameWidget(
-      'multiplier badge is empty when multiplier is 1',
-      verify: (game, _) async {
-        final texts =
-            _scoreDisplay(game).children.whereType<TextComponent>().toList();
-        expect(texts.last.text, equals(''));
-      },
-    );
-  });
+    testWidgets('fish counter updates when notifier changes', (tester) async {
+      game.fishCountNotifier.value = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HudOverlay(game: game),
+          ),
+        ),
+      );
+      expect(find.text('x0'), findsOneWidget);
 
-  group('LifeDisplay', () {
-    LifeDisplay _lifeDisplay(FelineDashGame game) => game
-        .camera.viewport.children
-        .whereType<HudComponent>()
-        .first
-        .children
-        .whereType<LifeDisplay>()
-        .first;
+      game.fishCountNotifier.value = 5;
+      await tester.pump();
+      expect(find.text('x5'), findsOneWidget);
+    });
 
-    tester.testGameWidget(
-      'shows startingLives icons initially',
-      verify: (game, _) async {
-        final livesText =
-            _lifeDisplay(game).children.whereType<TextComponent>().first;
-        expect(
-          livesText.text,
-          equals(List.filled(GameConstants.startingLives, LifeDisplay.lifeIcon)
-              .join(' ')),
-        );
-      },
-    );
-
-    tester.testGameWidget(
-      'updates icon count when lives increase via milk bottle',
-      verify: (game, _) async {
-        game.sfxEnabled = false;
-        game.activatePowerUp(PowerUpType.milkBottle);
-        final livesText =
-            _lifeDisplay(game).children.whereType<TextComponent>().first;
-        expect(
-          livesText.text,
-          equals(
-              List.filled(GameConstants.startingLives + 1, LifeDisplay.lifeIcon)
-                  .join(' ')),
-        );
-      },
-    );
-
-    tester.testGameWidget(
-      'LifeDisplay is positioned at the right edge of the screen',
-      verify: (game, _) async {
-        final ld = _lifeDisplay(game);
-        // After resize the x position should be near the right edge
-        expect(ld.position.x, greaterThan(game.size.x * 0.5));
-      },
-    );
+    testWidgets('shows input hint labels', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HudOverlay(game: game),
+          ),
+        ),
+      );
+      expect(find.text('JUMP'), findsOneWidget);
+      expect(find.text('SLIDE'), findsOneWidget);
+    });
   });
 }

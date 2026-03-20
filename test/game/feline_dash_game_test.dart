@@ -43,9 +43,12 @@ void main() {
     );
 
     gameTester.testGameWidget(
-      'backgroundColor is sky blue',
+      'backgroundColor is warm surface color',
       verify: (game, tester) async {
-        expect(game.backgroundColor().value, equals(0xFF87CEEB));
+        expect(
+          game.backgroundColor(),
+          equals(ThemeColors.gameBackground),
+        );
       },
     );
 

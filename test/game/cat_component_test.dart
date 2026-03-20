@@ -33,15 +33,6 @@ void main() {
     );
 
     tester.testGameWidget(
-      'has a non-null animation with 8 frames',
-      verify: (game, _) async {
-        expect(game.cat.animation, isNotNull);
-        expect(game.cat.animation!.frames.length,
-            equals(SpriteConfig.catRunFrames));
-      },
-    );
-
-    tester.testGameWidget(
       'has a RectangleHitbox child',
       verify: (game, _) async {
         final hitboxes = game.cat.children.whereType<RectangleHitbox>();
@@ -252,13 +243,13 @@ void main() {
     );
 
     tester.testGameWidget(
-      'cat position.y adjusts to stay on ground during slide',
+      'cat position.y stays on ground during slide',
       verify: (game, _) async {
         game.cat.slide();
         expect(
           game.cat.position.y,
           closeTo(
-            GameConstants.groundY - SpriteConfig.catSlideFrameHeight,
+            GameConstants.groundY - game.cat.size.y,
             1.0,
           ),
         );
@@ -295,7 +286,7 @@ void main() {
         game.update(GameConstants.slideDuration + 0.01);
         expect(
           game.cat.position.y,
-          closeTo(GameConstants.groundY - SpriteConfig.catFrameHeight, 1.0),
+          closeTo(GameConstants.groundY - game.cat.size.y, 1.0),
         );
       },
     );

@@ -18,6 +18,9 @@ dependencies:
   # ── State management (outside game world) ──────────────────────────────────
   flutter_riverpod: ^2.5.0
 
+  # ── Fonts ─────────────────────────────────────────────────────────────────
+  google_fonts: ^6.0.0
+
   # ── Local persistence ──────────────────────────────────────────────────────
   hive_flutter: ^1.1.0
   shared_preferences: ^2.3.0

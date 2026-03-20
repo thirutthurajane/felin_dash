@@ -9,9 +9,7 @@ import 'package:flutter/widgets.dart';
 import '../core/constants.dart';
 import 'components/collectibles/power_up_type.dart';
 import 'components/environment/ground_component.dart';
-import 'components/environment/milestone_flash_component.dart';
 import 'components/environment/parallax_background.dart';
-import 'components/hud/hud_component.dart';
 import 'components/player/cat_component.dart';
 import 'systems/difficulty_system.dart';
 import 'systems/score_system.dart';
@@ -19,8 +17,11 @@ import 'components/collectibles/collectible_component.dart';
 import 'components/obstacles/obstacle_component.dart';
 import 'systems/spawn_system.dart';
 
-/// Overlay key for the game-over screen.
+/// Overlay keys for Flutter overlays registered in [GameWidget].
 const String kGameOverOverlay = 'GameOver';
+const String kHudOverlay = 'Hud';
+const String kPauseOverlay = 'Pause';
+const String kCountdownOverlay = 'Countdown';
 
 class FelineDashGame extends FlameGame
     with HasCollisionDetection, KeyboardEvents, TapCallbacks, DragCallbacks {
@@ -50,6 +51,12 @@ class FelineDashGame extends FlameGame
   /// Clears [lastSfxRequested]; used in tests to reset between assertions.
   void clearSfxLog() => lastSfxRequested = null;
 
+  // ── ValueNotifiers for Flutter HUD overlay ────────────────────────────────
+
+  final distanceNotifier = ValueNotifier<int>(0);
+  final fishCountNotifier = ValueNotifier<int>(0);
+  final livesNotifier = ValueNotifier<int>(GameConstants.startingLives);
+
   // ── Power-up state ────────────────────────────────────────────────────────
 
   PowerUpType? _activePowerUp;
@@ -67,7 +74,7 @@ class FelineDashGame extends FlameGame
   double _dragDeltaY = 0.0;
 
   @override
-  Color backgroundColor() => const Color(0xFF87CEEB);
+  Color backgroundColor() => ThemeColors.gameBackground;
 
   @override
   Future<void> onLoad() async {
@@ -88,8 +95,6 @@ class FelineDashGame extends FlameGame
 
     spawnSystem = SpawnSystem();
     await add(spawnSystem);
-
-    camera.viewport.add(HudComponent());
   }
 
   @override
@@ -97,6 +102,10 @@ class FelineDashGame extends FlameGame
     super.update(dt);
     scoreSystem.addDistanceScore(dt);
     _tickPowerUp(dt);
+
+    // Push state to Flutter HUD overlay
+    distanceNotifier.value = difficultySystem.distanceTravelled.toInt();
+    fishCountNotifier.value = scoreSystem.fishCount;
   }
 
   // ── Collectible callbacks ─────────────────────────────────────────────────
@@ -104,6 +113,7 @@ class FelineDashGame extends FlameGame
   /// Called by [CatComponent] when it overlaps a [FishToken].
   void onFishCollected() {
     scoreSystem.addFish();
+    fishCountNotifier.value = scoreSystem.fishCount;
     _playSfx(AudioAssets.sfxCollectFish);
   }
 
@@ -123,6 +133,7 @@ class FelineDashGame extends FlameGame
         _powerUpTimer = GameConstants.yarnDuration;
       case PowerUpType.milkBottle:
         lives = (lives + 1).clamp(0, GameConstants.maxLives);
+        livesNotifier.value = lives;
         onLivesChanged?.call(lives);
         _activePowerUp = null; // instant — no timer
     }
@@ -132,12 +143,7 @@ class FelineDashGame extends FlameGame
 
   // ── Game reset ───────────────────────────────────────────────────────────
 
-  /// Resets all game state back to initial values so the player can retry.
-  ///
-  /// Removes all in-flight obstacles and collectibles, resets the cat, score,
-  /// difficulty, and power-up state.
   void resetGame() {
-    // Remove all obstacles and collectibles that are currently on screen.
     children
         .whereType<ObstacleComponent>()
         .toList()
@@ -147,20 +153,29 @@ class FelineDashGame extends FlameGame
         .toList()
         .forEach((c) => c.removeFromParent());
 
-    // Reset systems.
     scoreSystem.reset();
     difficultySystem.reset();
     spawnSystem.reset();
 
-    // Reset game-level state.
     lives = GameConstants.startingLives;
     isInvincible = false;
     finalScore = 0;
     _deactivatePowerUp();
+
+    // Reset notifiers
+    distanceNotifier.value = 0;
+    fishCountNotifier.value = 0;
+    livesNotifier.value = lives;
     onLivesChanged?.call(lives);
 
-    // Reset the cat last so it starts running again.
     cat.reset();
+  }
+
+  // ── Pause ─────────────────────────────────────────────────────────────────
+
+  void pauseGame() {
+    pauseEngine();
+    overlays.add(kPauseOverlay);
   }
 
   // ── Tap input ────────────────────────────────────────────────────────────
@@ -190,10 +205,8 @@ class FelineDashGame extends FlameGame
   void onDragEnd(DragEndEvent event) {
     super.onDragEnd(event);
     if (_dragDeltaY > _swipeThreshold) {
-      // Swipe down → slide
       cat.slide();
     } else if (_dragDeltaY < -_swipeThreshold) {
-      // Swipe up → end slide early
       cat.endSlide();
     }
     _dragDeltaY = 0.0;
@@ -221,9 +234,6 @@ class FelineDashGame extends FlameGame
 
   // ── Death handling ───────────────────────────────────────────────────────
 
-  /// Called by [CatComponent] when it first collides with an obstacle.
-  ///
-  /// No-op if the cat is already dead or currently invincible (catnip).
   void handleCatDeath() {
     if (cat.isDead || isInvincible) return;
 
@@ -232,7 +242,6 @@ class FelineDashGame extends FlameGame
     cat.die();
   }
 
-  /// Called by [CatComponent] after the death animation finishes.
   void onDeathAnimationComplete() {
     overlays.add(kGameOverOverlay);
   }
